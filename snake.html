@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>贪吃蛇网页版</title>
+    <style>
+        body { text-align: center; background: #222; color: #fff; }
+        canvas { background: #333; display: block; margin: 20px auto; }
+        #score, #highscore { font-size: 20px; margin: 10px; }
+        #startBtn { font-size: 18px; padding: 8px 20px; margin: 10px; }
+    </style>
+</head>
+<body>
+    <h1>贪吃蛇网页版</h1>
+    <div id="score">当前分数: 0</div>
+    <div id="highscore">最高分: 0</div>
+    <button id="startBtn">开始游戏</button>
+    <canvas id="game" width="400" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+        const box = 20;
+        let snake, direction, food, score, highscore, running;
+        
+        function resetGame() {
+            snake = [{x: 9, y: 10}, {x: 8, y: 10}, {x: 7, y: 10}];
+            direction = 'RIGHT';
+            food = {
+                x: Math.floor(Math.random() * 20),
+                y: Math.floor(Math.random() * 20)
+            };
+            score = 0;
+            running = false;
+            updateScore();
+            draw();
+        }
+        
+        function updateScore() {
+            document.getElementById('score').innerText = '当前分数: ' + score;
+            document.getElementById('highscore').innerText = '最高分: ' + highscore;
+        }
+        
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // 画蛇
+            for (let i = 0; i < snake.length; i++) {
+                ctx.fillStyle = i === 0 ? '#0f0' : '#fff';
+                ctx.fillRect(snake[i].x * box, snake[i].y * box, box, box);
+            }
+            // 画食物
+            ctx.fillStyle = '#f00';
+            ctx.fillRect(food.x * box, food.y * box, box, box);
+        }
+        
+        function gameLoop() {
+            if (!running) return;
+            let head = {x: snake[0].x, y: snake[0].y};
+            if (direction === 'LEFT') head.x--;
+            if (direction === 'RIGHT') head.x++;
+            if (direction === 'UP') head.y--;
+            if (direction === 'DOWN') head.y++;
+            // 撞墙
+            if (head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20) {
+                running = false;
+                resetGame();
+                return;
+            }
+            // 撞自己
+            for (let i = 0; i < snake.length; i++) {
+                if (head.x === snake[i].x && head.y === snake[i].y) {
+                    running = false;
+                    resetGame();
+                    return;
+                }
+            }
+            snake.unshift(head);
+            // 吃到食物
+            if (head.x === food.x && head.y === food.y) {
+                score++;
+                if (score > highscore) {
+                    highscore = score;
+                    localStorage.setItem('snake_highscore', highscore);
+                }
+                updateScore();
+                food = {
+                    x: Math.floor(Math.random() * 20),
+                    y: Math.floor(Math.random() * 20)
+                };
+            } else {
+                snake.pop();
+            }
+            draw();
+        }
+        
+        document.addEventListener('keydown', function(e) {
+            if (!running) return;
+            if (e.key === 'ArrowLeft' && direction !== 'RIGHT') direction = 'LEFT';
+            if (e.key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
+            if (e.key === 'ArrowUp' && direction !== 'DOWN') direction = 'UP';
+            if (e.key === 'ArrowDown' && direction !== 'UP') direction = 'DOWN';
+        });
+        
+        document.getElementById('startBtn').onclick = function() {
+            if (!running) {
+                running = true;
+                updateScore();
+            }
+        };
+        
+        // 读取最高分
+        highscore = parseInt(localStorage.getItem('snake_highscore')) || 0;
+        resetGame();
+        setInterval(gameLoop, 120);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+main(a,b,c){scanf("%d%d%d",&a,&b,&c);a>b?a^=b^=a^=b:0;a>c?a^=c^=a^=c:0;b>c?b^=c^=b^=c:0;printf("%d %d %d",a,b,c);}
