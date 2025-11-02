@@ -8,6 +8,10 @@ typedef struct Node {
 } Node;
 
 void insert_at_head(Node* head, const char* task) {
+    if (head == NULL || task == NULL) {
+        printf("Error: Invalid parameters\n");
+        return;
+    }
     
     Node* new_node = (Node*)malloc(sizeof(Node));
     if (new_node == NULL) {
@@ -43,6 +47,10 @@ void insert_at_tail(Node* head, const char* task) {
 }
 
 void insert_at_position(Node* head, const char* task, unsigned int pos) {
+    if (head == NULL || task == NULL) {
+        printf("Error: Invalid parameters\n");
+        return;
+    }
 
     Node* new_node = (Node*)malloc(sizeof(Node));
     if (new_node == NULL) {
@@ -70,8 +78,8 @@ void insert_at_position(Node* head, const char* task, unsigned int pos) {
     current->next = new_node;
 }
 
-void delete_first(Node* head){
-    if (head->next == NULL){
+void delete_first(Node* head) {
+    if (head == NULL || head->next == NULL) {
         printf("fail to target the aim\n");
         return;
     }
@@ -80,14 +88,14 @@ void delete_first(Node* head){
     free(temp);
 }
 
-void delete_last(Node* head){
-    if (head->next == NULL){
+void delete_last(Node* head) {
+    if (head == NULL || head->next == NULL) {
         printf("fail to target the aim\n");
         return;
     }
 
     Node* current = head;
-    while (current->next->next != NULL){
+    while (current->next->next != NULL) {
         current = current->next;
     }
     Node* temp = current->next;
@@ -95,30 +103,29 @@ void delete_last(Node* head){
     free(temp);
 }
 
-void delete_note(Node* head, char* target){
-    if (head->next == NULL){
+void delete_note(Node* head, char* target) {
+    if (head == NULL || head->next == NULL || target == NULL) {
         printf("fail to target the aim\n");
         return;
     }
 
     Node* current = head;
-    while (current->next != NULL
-        && strcmp(current->next->task, target) != 0){
+    while (current->next != NULL && strcmp(current->next->task, target) != 0) {
         current = current->next;
     }
 
-    if (current->next != NULL){
+    if (current->next != NULL) {
         Node *temp = current->next;
-        current->next == temp->next;
+        current->next = temp->next; 
         free(temp);
+    } else {
+        printf("fail to find the target\n");
     }
-    else {
-        printf("fail to find the target");
-    }
-
 }
 
 void free_list(Node* head) {
+    if (head == NULL) return;
+    
     Node* current = head;
     while (current != NULL) {
         Node* temp = current;
@@ -128,6 +135,10 @@ void free_list(Node* head) {
 }
 
 void traverse_list(Node* head) {
+    if (head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
 
     Node* current = head->next;
     int index = 1;
@@ -137,6 +148,23 @@ void traverse_list(Node* head) {
         current = current->next;
     }
     printf("---\n");
+}
+
+void reverse_list(Node* head) {
+    if (head == NULL || head->next == NULL || head->next->next == NULL)
+        return; 
+    
+    Node* current = head->next;
+    Node* prev = NULL;
+    Node* next = NULL;
+    
+    while (current != NULL) {
+        next = current->next;
+        current->next = prev;
+        prev = current;
+        current = next;
+    }
+    head->next = prev; 
 }
 
 int main() {
@@ -157,6 +185,14 @@ int main() {
     
     printf("After inserting at position 1:\n");
     insert_at_position(head, "learn data analysis", 1);
+    traverse_list(head);
+
+    printf("After reverse the list:\n");
+    reverse_list(head);
+    traverse_list(head);
+
+    printf("After deleting first:\n");
+    delete_first(head);
     traverse_list(head);
 
     free_list(head);
